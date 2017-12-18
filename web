@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="web-app">
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+	    <meta http-equiv="pragma" content="no-cache" />
+	    <link rel="shortcut icon" href="https://www.mediacom.no/content/themes/mediacom/assets/build/images/icons/favicon.ico" type="image/png">
+	    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	    
+	    <title>Mediacom</title>
+	    <base href="/">
+   		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+	    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Gudea">
+	    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+	    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	 <!--  	<link href="/css/materialize-style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+		<link rel="stylesheet" type="text/css" href="/css/sweet-alert/sweetalert.css"> -->
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>	
+	</head>
+	<body>
+		
+		<style>
+			@media only screen and (min-width: 1024px){
+				.logo {
+					height: auto !important;
+					margin-left: 0 !important; 
+					width: 11.25rem !important;
+				}
+				
+				#copy{
+					display:block !important;
+				}
+				#copy_mobile{
+					display:none !important;
+				}
+			}
+			html{
+				font-family:"franklin-gothic-urw",sans-serif !important;
+			}
+			select{
+				display:block;
+				border: 1px solid lightgrey !important;
+				    margin: 0 0 15px 0 !important;
+			}
+			.logo{
+				/*height:60px;
+				padding-top:15px;*/
+				display: block;
+				height: 2.125rem;
+				position: absolute;
+				left: -1rem;
+				top: 1.2rem;
+				width: 8.125rem;
+			}
+			.container{
+				top:60px;
+				position:relative;
+				border:1px solid black;
+			/*	left:50px !important;*/
+				margin:0px 0px 10px 10px;
+			}
+			
+			.leftpad{
+				margin-left:20px;
+			}
+			input{
+				border: 1px solid lightgrey !important;
+				padding-left: 10px !important;
+			}
+			
+			.pink{
+				background-color:#e1005d !important;
+			}
+			.picker__frame{
+				margin-top:-10px !important;
+			}
+			.picker__table{
+				margin-top:-10px !important;
+				margin-bottom: -10px !important;
+			}
+			#cover{
+			    position:fixed;
+			    top:0;
+			    left:0;
+			    background:rgba(0,0,0,0.6);
+			    z-index:5;
+			    width:100%;
+			    height:100%;
+			    display:none;
+			}
+			
+			#modal1{
+			  transition: all .3s ease;
+			  -webkit-transition: all .3s ease;
+			  animation: scale-display .3s;
+                          display: none;
+			}
+			
+			@keyframes scale-display {
+				0% {
+					opacity: 0;
+					transform: scale(0);
+			    -webkit-transform: scale(0);
+				}
+				100% {
+					opacity: 1;
+					transform: scale(1);
+			    -webkit-transform: scale(1);
+				}
+			}
+			@keyframes scale-display--reversed {
+				0% {
+					display: inline-flex;
+					opacity: 1;
+					transform: scale(1);
+					-webkit-transform: scale(1);
+				}
+				99% {
+					display: inline-flex;
+					opacity: 0;
+					transform: scale(0);
+					-webkit-transform: scale(0);
+				}
+				100% {
+					display: none;
+					opacity: 0;
+					transform: scale(0);
+					-webkit-transform: scale(0);
+				}
+			}
+			
+		</style>
+		<script>
+			var app = angular.module('web-app', []);
+			app.controller('InfoController', function($scope,$window,$location) {
+				
+				//clientID:622320244089-k2r7rkiaadpm5sufp415jcofa8m2ss20.apps.googleusercontent.com
+				//client secret:rosjtfDR5X5ZQV72PUajO6d3
+				//API key:AIzaSyA8m2aF8gfWqyw7D9_4oioznw4sTnyyiDE
+				
+				$scope.campaign={};
+				$scope.operator=[];
+				$scope.campaignName="";
+				//$scope.campaign.client="<Plukke ut Kund navn>";
+				//$scope.campaign.operator="<Plukke ut Operatør navn>";
+				$scope.operatorList=['<Plukke ut Operatør navn>'];
+				$scope.clientList=['Akzo Nobel Coatings AB','Arbeiderpartiet','Bausch & Lomb  - MC SE','Bluesun via MCSE','BN Bank ASA','Borregaard AS','Bose GP  Norge','Byggma ASA',
+								'BYGGMAKKER HANDEL AS','Stangeskovene Kværner AS','Croatian National Tourist Board','De\'Longhi Group','Destinasjon Trysil','E-boks Norway via  - Mediabroker AS',
+								'Fagforbundet','Flytoget AS','Fornebu Grunneierforening','Etteretningstjenesten OSLO','Forsvaret','FORSVARSMATERIELL','FotoKnudsen AS','Fox - SFNorge','Goodyear Dunlop Tires Norway AS',
+								'Goodyear Dunlop Tires Sverige AB','GSK Consumer Healthcare','GSK Pharma','Novartis  - GSK','Haby AS','HI FI KLUBBEN (Norge)','Gardena','Husqvarna Norge AS','Jonsered','007 - IKEA AS (Sørlandet)',
+								'076P1 - IKEA AS (Tromsø)','076P2 - IKEA AS (Ålesund)','091 - IKEA AS (Slependen)','095 - IKEA AS (Furuset)','126 - IKEA AS (Forus)','371 - IKEA AS (Leangen)','390 - IKEA AS (Ringsaker)','441 - IKEA AS (Åsane)',
+								'IKEA AS (Sentralt), Marketing','IKEA AS (Sentralt), PR&Com','IKEA AS (Sentralt), Social & Environment','INNOVASJON NORGE','iRobot Corporation','Jensens Bøfhus','Jotex AB','Byporten ANS','FORNEBU SENTER AS','KLP',
+								'KLP - GLASMAGASINET ANS','KLP Banken','KLP Paleet','Diplom-Is AS','Fjordland AS','Fjordland Ferdigretter','Fjordland KOS','Fjordland Margariner','Fjordland Yoplait','GILDE','Grønt Punkt Norge AS','HOFF SA',
+								'Matmerk','Melk.no','Nortura SA Fakturamottak (Storkjøkk','OEK','OFG','Ostecompaniet AS','PRIOR','TINE SA','TINE SA - Biola','TINE SA - Go\'Morgen','TINE SA - Jarlsberg','TINE SA - Litago Drikke','TINE SA - Norvegia',
+								'TINE SA - NÅ','TINE SA - Osteriet','TINE SA - Piano','TINE SA - Revet ost','TINE SA - Rislunsj','TINE SA - Sprett','TINE SA - Sunniva Drikker','TINE SA - TINE 14','TINE SA - TINE Brunost','TINE SA - TINE Hvit Geitost',
+								'TINE SA - TINE Iskaffe','TINE SA - TINE Kremost','TINE SA - TINE Matlagingsprodukter','TINE SA - TINE Melk','TINE SA - TINE Yoghurt','TINE SA - Tine Økologiske produkter','TINE SA - YT','TINE SA - Østavind','Mars Dolmio',
+								'Mars Extra','Mars Pedigree','Mars Sheba','Mars Snickers','Mars Uncle Ben\'s','Mars Whiskas','Aktiv Auto AS','Albjerk Bil Drammen - S221','Albjerk Bil Lier AS - V212','Albjerk Bil Lier AS - V220','Alta Motor - S110','Alta Motor AS',
+								'Autoria Kolbotn AS V021','Autoria Oppegård Bil - S051','Autoria Ski - S768','Autosenteret Notodden AS','Berge & CO Førde A300','Berge & Co. - S300','Berge & Co. AS avd. Førde','Berge & Co. AS avd. Sogndal','Berge & Co. AS avd. Stryn',
+								'Berge & Co. AS avd. Ørsta','Bil i Nord Lofoten AS','Bilsenteret Namsos AS V640','Dahles Auto Fredrikstad AS A290','Dahles Auto Halden AS','Dahles Auto Råbekken - S478','Dahles Auto Sarpsborg AS - S770','Dahles Auto Sarpsborg AS A770',
+								'Dahles Auto Sarpsborg AS V360','Dahles Auto Sarpsborg AS V770','Erling Rød, V130','G-Bil - S324','Grenland Auto','Grenland Bilservice - S707','Gromstad Bil & Båt AS','Gromstad Motor Stoa - S124','Gumpens Auto Lyngdal - S560','Gumpens Auto Lyngdal AS',
+								'Gumpens Auto Vest AS V490','Gumpens Auto Øst AS A495','Hamax Auto - S400','Hamax Auto AS','Hamax Auto AS A400','Hamjern Bil - S363','Hammerfest Auto AS V351','Hansens Bilverksted AS','Harald A Møller - SEAT','Harald A. Møller AS Diverse',
+								'Harald A. Møller AS Netthandel','Harald A. Møller AS, Audi Forhandler','Harald A. Møller AS, Audi Importør','Harald A. Møller AS, Audi Service','Harald A. Møller AS, Nyttekjøretøy','Harald A. Møller AS, Skoda Forhandl - SKO1','Harald A. Møller AS, Skoda Importør - SK00',
+								'Harald A. Møller AS, VW Forhandlere','Harald A. Møller AS, VW Importør','HMV Bilsenter AS V900','Kirkenes Bil AS','Leif Gromstads Auto AS','Ljosland Bil AS','Madsen Bil - S801','Madsen Bil A801','Madsen Bil AS, avd. Levanger/Verdal','Motorpartner Namsos - S568','Mysen Bil - S131',
+								'Møller Bil AS','Møller Bil Bergen AS - S157','Møller Bil Bergen AS, Drotningsvik V155','Møller Bil Bergen AS, Kokstad - S108','Møller Bil Bergen AS, Minde A150','Møller Bil Bergen AS, Nesttun V160','Møller Bil Bergen AS, Åsane V156','Møller Bil Ensjø AS A030',
+								'Møller Bil Follo AS','Møller Bil Follo AS A773','Møller Bil Forus - Audi A785','Møller Bil Haugesund - S390','Møller Bil Haugesund A390','Møller Bil Haugesund V390','Møller Bil Hedmark, Elverum','Møller Bil Hedmark, Hamar','Møller Bil Hedmark, Hamar A370',
+								'Møller Bil Hedmark, Kongsvinger','Møller Bil Jessheim - S440','Møller Bil Jessheim AS A440','Møller Bil Molde AS','Møller Bil Oppland, Gjøvik A330','Møller Bil Oppland, Gran','Møller Bil Oppland, Lillehammer V540','Møller Bil Romerike AS A550',
+								'Møller Bil Stavanger V790','Møller Bil Sør-Rogaland AS V230','Møller Bil Sør-Rogaland AS V795','Møller Bil Sør-Rogaland Forus - S494','Møller Bil Trondheim A830','Møller Bil Trondheim AS avd. Stjørdal','Møller Bil Trondheim V830',
+								'Møller Bil Trondheim, Leangen - S843','Møller Bil Trøndelag  (Orkdal Bil) - S832','Møller Bil Vest AS, Asker & Bærum','Møller Bil Vest AS, Asker & Bærum A040','Møller Bil Vest AS, Oslo A011','Møller Bil Vest AS, Skøyen V010',
+								'Møller Bil Vestfold AS, Larvik V530','Møller Bil Vestfold AS, Sandefjord A535','Møller Bil Vestfold AS, Sandefjord V535','Møller Bil Vestfold AS, Tønsberg - A851','Møller Bil Vestfold AS, Tønsberg - S851','Møller Bil Vestfold AS, Tønsberg V851',
+								'Møller Bil Vestfold, avd. Horten V410','Møller Bil Øst AS, Kalbakken V032','Møller Bil Øst AS, Ryen V020','Møller Bil Ålesund AS','Møller BilPartner AS, Etterstad - S083','Møller BilPartner AS, Grorud - S018','Møller BilPartner AS, Rud - S137',
+								'Møller BilPartner AS, Rygge - S617','Møller Bilpartner Hvam - S556','Møller Service','Møllergruppen AS','Nardo Bilservice - S607','Nesbyen Auto AS','Nordlie Auto AS - S610','Odda Bilsenter AS V690','Orkdal Bil AS V832','Skaansar Auto - S594','Skien Bil AS',
+								'Skrim Bil - S472','Slatlem Bilsentrum AS','Slatlem Molde - S604','Solum Auto - S532','Sortland Auto AS - V812','Sulland Bardufoss','Sulland Bodø - S185','Sulland Bodø AS','Sulland Elverum - S255','Sulland Harstad - S380','Sulland Harstad AS V380','Sulland Mo AS',
+								'Sulland Otta AS','Sulland Tromsø - S820','Sulland Tromsø AS V820','Svebjørn Auto - S650','Svebjørn Auto AS','Topp Auto Rambekk - S365','Valdres Auto AS','Nestlé After Eight','Nestlé Babyfood','Nestlé Cheerios','Nestlé Confectionary','Nestlé Culinary Sweet Milk','Nestlé Dog Adventuros',
+								'Nestlé Fitness','Nestlé Friskies','Nestlé Gourmet','Nestlé Health Care Nutrition','Nestlé Health Science','Nestlé Infant Nutrition NAN','Nestlé Maggi','Nestlé Nescafé','Nestlé Nescafé Dolce Gusto','Nestlé Nespresso','Nestlé Norge','Nestlé Purina','Nestlé Purina One','Nestlé Pussi',
+								'TIVALL SWEDEN AB','Nestlé Fitness MC SE','Net Trading Group NTG AB','Nikon Europe BV','Nikon UK Ltd NUF','Norges Yrkesakademi AS','Salmon Brands AS','Skagen AS','Skoringen - MEDIACOM DANMARK','Sonans Privatgymnas','Sonans Videregående Skole Oslo AS','Sony Mobile','EiendomsMegler 1 Midt-Norge AS',
+								'EiendomsMegler 1 Norge','EiendomsMegler 1 Oslo Akershus AS','SpareBank 1 Banksamarbeidet','SpareBank 1 Buskerud Vestfold','SpareBank 1 Finans Nord-Norge','SpareBank 1 Finans Østlandet','SpareBank 1 Forsikring','SpareBank 1 Gudbrandsdal','SpareBank 1 Hallingdal Valdres','SpareBank 1 Kredittkort',
+								'SpareBank 1 Lom og Skjåk','SpareBank 1 Mobilbetaling','SpareBank 1 Modum','SpareBank 1 Nord-Norge','SpareBank 1 Nordvest','SpareBank 1 Ringerike Hadeland','SpareBank 1 SMN','SpareBank 1 SMN Finans','SpareBank 1 SR-Bank','SpareBank 1 Søre Sunnmøre','SpareBank 1 Telemark','SpareBank 1 Østfold Akershus',
+								'SpareBank 1 Østlandet','SpareBank 1 Østlandet, Avd. Hedmark','SpareBank 1 Østlandet, Avd. Oslo Akershus','St1 Norge AS','Studentsamskipnaden i Oslo og Akershus','Subway Norge','Unisub AS','Tempur Sealy Norway AS','Trysil kommune SITE Destination','Utleiemegleren Forvaltning AS','Mensendieck Klinikken',
+								'Volvat Medisinske Senter AS','Volvat Medisinske Senter Stokkan','Volvat Medisinske Senter Tromsø','Wallmans Salonger Oslo AS','Weber - SAINT-GOBAIN BYGGEVARER'];
+				//$scope.campaign.over='<Plukke ut Overprodukt navn>';
+				$scope.overList=['** Produkt mangler **','3140','471/ 2204  Ordføreropprop','5911 Avisannonsering','5911 FY16 Avisannonsering','5911 FY17 Avisannonsering','5911 Press','5911 Press FY18','5911 Press/FY17 Ålesund ISPUP','5911 Press/FY17 Tromsø ISPUP','5911 Press/FY17/EG ,Brand',
+								'5911 Printannonsering','5911/FY17 Printannonsering','5921 OOH','5921 OOH/FY17','5921 OOH/FY17 Skøyen ISPUP','5971 TV & Film','5971/TV & Film FY17/GWI, Brand','5975 Search','5976 Facebook','5976 FY17 Online','5975 Search/FY17/EG, Brand','5976 Online','5976 Online FY17','5976 FY17 Online annonsering',
+								'5976 Online/FY17','5976 Online/FY16/GWI, Act','5976 Online/FY17/EG, Brand','5976/FY17 Online','5976 Online/FY17/GWI, Act','5977 Online/FY16/EG, Act','5977 Online/FY17','5977 Online/FY17 Skøyen ISPUP','5977 Online/FY17 Ålesund ISPUP','5977 Online/FY17 Tromsø ISPUP','5977 Online/FY17/EG, Act',
+								'5977 Online/FY17/GWI, Act','5978 Online Video/FY16 GWI, Act','5978 Online Video/FY17 GWI, Act','5978 Online Video/FY17 Skøyen ISPUP','A Cure for Wellness','6013 Katalog','After Eight','Akershus Slottskirke','Alien Covenant','Aksjesparekonto','Always On','Amarok','Andel Forsikring','Approved Plus',
+								'Annonsering','Åreknuter','Ariel','Assassins`s Creed','ASK','AUDI','AUDI A4','Athletica','AUDI A5','AUDI A8','AUDI Club Norway','AUDI lokalannonsering','AUDI Q5','AUDI R8','AUDI Service','B2B','B2C Iced Coffee','Banken 3140','Barn','BFFT','BN Bank','Boliglån','BM','Bose Headphones','Brelett','Brand',
+								'Bygdeturisme','Bremykt','Bruktbil','Byggmakker','Byporten','Byttehelg','Caddy og Transporter','Caddy, Transporter og Crafter','Caddy/Transporter','Cheesepop','Consideration','Content/Plastikk kirurgi','	Crafter','Cosmedical','D7500','De\'Longhi','DAB+','Damesko','Døla Is','Diverse produkter','Dolmio',
+								'Dream','Double 0%','Drikke','E-boks','Dunlop MC','DSG','Egg','E-Golf','e-mobility','E-tron','Facebook direkte','Facebook','FAKT','FAKT/Forsvarets fellestjenester','Fast Start','Felles','Felles forhandlerfakturering','Fellesannonse Jubileum','Ferdinand','Felleskampanje Gilde og Prior','Ferdigstekte Hamburgere og Kjøttkaker',
+								'Fiks Ferdig','Fjordland sentralt','Fitness','Flytoget','Flytogmodus','Fond','Forbruker','Forh 051 v/Vidar Sand','Forh 083 v/Svein Manley','Forh 11 v/Kjetil Presterud.','Forh 108 v/Harald Torjussen','Forh 10 v/Endre Nordbø','Forh 11,30,40,440,550,773 Kjetil Presterud.','Forh 110 v/Erling Joranger','Forh 110 v/Morten Andresen',
+								'Forh 124 v/Vidar Sand','Forh 120 v/Arne Kjellemo','Forh 120 v/Morten Andresen','Forh 137 v/Svein Manley','Forh 130 v/Arne Kjellemo','Forh 130 v/Martin Gjerstad','Forh 150 v/ Kjetil Presterud.','Forh 155 v/Arne Kjellemo','Forh 155 v/Bjørn Roar Østli','Forh 156 v/Arne Kjellemo','Forh 156 v/Bjørn Roar Østli','Forh 160 v/Arne Kjellemo',
+								'Forh 18 v/Svein Manley','Forh 160 v/Bjørn Roar Østli','Forh 185 v/Endre Nordbø','Forh 20 v/Endre Nordbø','Forh 21 v/Arne Kjellemo','Forh 21 v/Martin Gjerstad','Forh 212 v/Erling Joranger','Forh 221 v/Vidar Sand','Forh 220 v/Bjørn Roar Østli','Forh 230 v/Erling Joranger','Forh 250 v/Erling Joranger','Forh 250+370 v/Martin Gjerstad',
+								'Forh 290 v/Henrik Jensen.','Forh 255 v/Vidar Sand','Forh 270 v/Erling Joranger','Forh 290 v/Endre Nordbø','Forh 30 v/Kjetil Presterud.','Forh 300 v/ Henrik Jensen.','Forh 300 v/Harald Torjussen','Forh 290 v/Martin Gjerstad','Forh 300 v/Arne Kjellemo','Forh 301 v/Arne Kjellemo','Forh 302 v/Arne Kjellemo','Forh 32 v/Endre Nordbø',
+								'Forh 32 v/Martin Gjerstad','Forh 330 v/ Henrik Jensen.','Forh 324 v/Vidar Sand','Forh 330 v/Erling Joranger','Forh 330 v/Martin Gjerstad','Forh 340 v/David O\'Sullivan','Forh 340 v/Erling Joranger','Forh 350 v/Erling Joranger','Forh 351 v/Morten Andresen','Forh 360 v/Ende Nordbø','Forh 370 v/ Henrik Jensen.','Forh 370 v/Erling Joranger',
+								'Forh 380 v/Endre Nordbø','Forh 390 v/Bjørn Roar Østli','Forh 390 v/Erling Joranger','Forh 390 v/Morten Lund.','Forh 40 v/Kjetil Presterud.','Forh 390 v/Harald Torjussen','Forh 40 v/Endre Nordbø','Forh 440 v/Morten Lund.','Forh 400 v/Erling Joranger','Forh 410 v/Bjørn Roar Østli','Forh 410 v/Erling Joranger','Forh 440 v/Endre Nordbø',
+								'Forh 440 v/Vidar Sand','Forh 440+550 v/Morten Andresen','Forh 469 v/Erling Joranger','Forh 469 v/Morten Andresen','Forh 472 v/Svein Manley','Forh 478 v/Vidar Sand','Forh 470 v/Endre Norbø','Forh 470 v/Martin Gjerstad','Forh 474 v/Endre Nordbø','Forh 495 v/Morten Lund.','Forh 494 v/Harald Torjussen','Forh 470 v/Endre Norbø',
+								'Forh 480 v/Erling Joranger','Forh 480 v/Martin Gjerstad','Forh 493 v/Arne Kjellemo','Forh 512 v/Morten Andresen','Forh 520 v/Bjørn Roar Østlie','Forh 490 v/Martin Gjerstad','Forh 535 v/Henrik Jensen.','Forh 550 v/ Morten Lund.','Forh 520 v/Erling Joranger','Forh 530 v/Bjørn Roar Østli','Forh 530 v/Erling Joranger',
+								'Forh 535 v/Bjørn Roar Østli','Forh 535 v/Erling Joranger','Forh 550 v/Endre Nordbø','Forh 540 v/Erling Joranger','Forh 550 v/Endre Nordbø','Forh 610 v/Henrik Jensen.','Forh 556 v/Svein Manley','Forh 568 v/Vidar Sand','Forh 594 v/Harald Torjussen','Forh 607 v/Harald Torjussen','Forh 560 v/Arne Kjellemo','Forh 590 v/Endre Nordbø',
+								'Forh 600 v/Arne Kjellemo','Forh 610 v/Arne Kjellemo','Forh 610 v/Svein Manley','Forh 650 v/Harald Torjussen','Forh 610 v/Morten Andresen','Forh 630 v/Erling Joranger','Forh 640 v/Endre Nordbø','Forh 640 v/Tom/Stian','Forh 650 v/Endre Nordbø','Forh 660 v/Arne Kjellemo','Forh 680 v/Endre Nordbø','Forh 770 v/Henrik Jensen.','Forh 707 v/Svein Manley',
+								'Forh 768 v/Vidar Sand','Forh 770 v/Vidar Sand','Forh 690 v/Erling Joranger','Forh 700+780 v/Martin Gjerstad','Forh 745 v/Endre Nordbø','Forh 770 v/Endre Nordbø','Forh 770 v/Martin Gjerstad','Forh 773 v/ Morten Lund.','Forh 785 v/Kjetil Presterud.','Forh 773 v/Endre Nordbø','Forh 780 v/Arne Kjellemo','Forh 790 v/Erling Joranger','Forh 790,795,230 v/Bjørn Roar Østlie',
+								'Forh 790+795+230 v/Erling Joranger','Forh 795 v/Erling Joranger','Forh 801 v/Endre Nordbø','Forh 801 v/Morten Lund.','Forh 801 v/Vidar Sand','Forh 820 v/Harald Torjussen','Forh 801 v/Morten Andresen','Forh 810 v/Endre Nordbø','Forh 812 v/Endre Nordbø','Forh 820 v/Endre Nordbø','Forh 820 v/Morten Andresen',
+								'Forh 822 v/Endre Nordbø','Forh 830 v/ Henrik Jensen','Forh 832 v/Vidar Sand','Forh 843 v/Vidar Sand','Forh 830 v/Arne Kjellemo','Forh 830 v/Bjørn Roar Østli','Forh 832 v/Arne Kjellemo','Forh 832 v/Bjørn Roar Østli','Forh 834 v/Bjørn Roar Østli','Forh 835 v/Arne Kjellemo','Forh 851 v/Henrik Jensen','Forh 851 v/Harald Torjussen','Forh 851 v/Bjørn Roar Østli',
+								'Forh 851 v/Erling Joranger','Forh 880 v/Erling Joranger','Forh 880 v/Morten Andresen','Forh 900 v/Arne M. Kjellemo','Forh 900 v/Bjørn Roar Østli','Forh 920 v/Arne Kjellemo','Gardena','Fornebu S','Frukt og Grønt','Fryd','Frokost og lunsj','Forhandleraktiviteter','Forhandlerannonsering Service','Forhandler','Forh 940 v/Arne Kjellemo',
+								'Hidden Figures','Goodyear','Glasmagasinet','Grøt','Go\' & Mager','Grønt Punkt','Grønn kommunikasjon','Helse & Velvære','Hjerte/Kardiologi','Huntonitt og Walls2paint','Husqvarna','I skål','Innovation','Hud','Informasjonsmøte Håndkirurgi','Informasjonsmøte Håndkirurgi og vonde knær','Informasjonsmøte Åreknuter','Informasjonsmøte Åreknuter og prostata kreft','Innsats',
+								'Kaptein Supertruse','Jonsered','IPS Individuell Pensjonssparing','Iskake','Jul','Innstift i avis','IPS','Jobbannonser','Kenwood Chef XL Titanium','Kenwood RANGE','Kingsman; The Golden Circle','KLP','Kjøttpålegg','Karbonader','KIL','Karoq','Kino','Kongelige Norske Marinenes Musikkkorps','KOS','Kyllingnuggets','Kodiaq','Kvikk service Bergen',
+								'Lagersalg','Kundeutbytte','Kreftbehandling','Kvinnehelseuke 2017','Magasin','Logan','Lokal','Lam','Liv Laga','Le Rustique','Launch','Leads','L\'Atelier','melk.no','MatPrat','MatPrat Rein','MatStart','Mellommåltid','Matfløte','Mellommåltid','Maggi','Magic Box','mCASH','Mitt Fornebu','Murder on the Orient Express','Middager',
+								'Næringsliv','Michelangelo','Middag, matlaging, dessert','MULTI','Merkevare','Mensendieck Trening','Nicotinell','Nestlé Cheerios','Nestlé Friskies','Nescafé Azera','Nescafé Gull','Nespresso','Nespresso Iskaffe','Nikon Sport Optics','Nasjonal ASK','Omdømme','Omdømme og Flyveskole','Nyt Norge','Økologisk','Nortura Proff','Norzola',
+								'Octavia','Nyttekjøretøy','Nytte','ONE og XL-BYGG','One Supertech','Online','Oslo Arbeiderparti','Paleet','Opphøgde potteter','Opplysningskontoret for frukt og grønt','Overvektskirurgi','Panodil Zap','Pålegg','Pedigree','Påske','PF11','PF31 og PF41','Pensjonskonto','Personforsikring','PETRO Finans','Proff','PR-avdelingen',
+								'Profil','Profil Takk for maten','Pølser','Potetmel','Profil','Pølseduellen','Print','Programatisk','Radisson','Range','Quattro','Radio','Purina Dog Adventuros','Purina','Purina One Cat','Purina One Dog','Prosjekt og Nybygg','Ryder og Automower','Royal Pinneis','Ris og korn','Range Digital','Rapid','Resorb','REAL Mat 51000630/6401/Erik Anker',
+								'Rex Diesel','Retargeting','Seniorlån','Sinnasnekker\'n','Sensodyne','Samsung','Selbu Blå','Sheba','Service','Service felles','Skyting','Småis','Skolefrukt','Skoda Forhandlerfond','Skoda annonsering','Skien Bil og Grenland Auto','Skagen Compass','SiO','SONOS','Smart Systems','Sous Vide','Smårett','SØK','Spesialitet','Snøfrisk','Snickers','SPINN',
+								'Stortingsvalget 2017','Stilling ledig','Spiseklare mellommåltider','Storhusholdning','Sporty','Sun Mobility','Spleis','Sterilisering','Taktisk','Sunt & Godt','Sunniva','Superb','Team EKS','Taktisk','Sykkel Sponsorat','Tema-kveld','Temakveld for håndlidelser','Temakveld Knær','Therapearl&Oxyal','Tidlig Snø','Trysil Hotel Vinter',
+								'Trysil Høstferie','The Boss Baby','The Greatest Showman','Three Billboards Outside Ebbing, Missouri','TINE Overordnet','Tempur','Uldal vinduer','Trysil Hotell','Trysil sommer','Trysilrittet','Utdanning','Turtelkuene','TV','TUT','Urologi','Veteran','Voltarol','Vaccines','Visit Norway','VW','Verksted','VW Nytte','Viking melk','Vipps','War for the planet of the apes',
+								'Watering','Wanted','Whiskas Våtfor','W1','W2','W3','W4','W5','Yoplait','Wrigley','Yeti'];
+				
+				//$scope.campaign.product='<Plukke ut Produkt>';
+				$scope.productList=['** Produkt mangler **','ONE og XL-BYGG','One Supertech','Online','Oslo Arbeiderparti','Stortingsvalget 2017','Therapearl&Oxyal','Ariel','BN Bank','Boliglån','Seniorlån','Stilling ledig','Bose Headphones','Huntonitt og Walls2paint','Magasin','Uldal vinduer','Byggmakker','Fiks Ferdig','Proff','Sinnasnekker\'n','De\'Longhi',
+									'Kenwood Chef XL Titanium','Kenwood RANGE','Radisson','Tidlig Snø','Trysil Hotel Vinter','Trysil Hotell','Trysil Høstferie','Trysil sommer','Trysilrittet','E-boks','471/ 2204  Ordføreropprop','Stortingsvalg 2017','Flytoget','Flytogmodus','Mitt Fornebu','Akershus Slottskirke','Facebook direkte','FAKT','FAKT/Forsvarets fellestjenester','Innsats',
+									'Kongelige Norske Marinenes Musikkkorps','Omdømme','Omdømme og Flyveskole','Skyting','Utdanning','Veteran','A Cure for Wellness','Alien Covenant','Assassins`s Creed','Ferdinand','Hidden Figures','Kaptein Supertruse','Kingsman; The Golden Circle','Logan','Murder on the Orient Express','The Boss Baby','The Greatest Showman','Three Billboards Outside Ebbing, Missouri',
+									'War for the planet of the apes','Goodyear','Dunlop MC','Nicotinell','Otrivin','Panodil Zap','Sensodyne','Voltarol','Vaccines','Lokal','Samsung','SONOS','Taktisk','Gardena','Smart Systems','Watering','Husqvarna','Ryder og Automower','Jonsered','5911 Printannonsering','5911/FY17 Printannonsering','5976 Online','5976/FY17 Online','5976 Online/FY17',
+									'5976 Online FY17','5977 Online/FY17','5911 Avisannonsering','5976 Facebook','5911 FY16 Avisannonsering','5911 FY17 Avisannonsering','5976 FY17 Online','5976 FY17 Online annonsering','5911 Press','5911 Press FY18','5911 Press/FY17 Tromsø ISPUP','5911 Press/FY17 Ålesund ISPUP','5911 Press/FY17/EG ,Brand','5921 OOH','5921 OOH/FY17','5921 OOH/FY17 Skøyen ISPUP',
+									'5971 TV & Film','5971/TV & Film FY17/GWI, Brand','5975 Search','5975 Search/FY17/EG, Brand','5976 Online/FY16/GWI, Act','5976 Online/FY17/EG, Brand','5976 Online/FY17/GWI, Act','5977 Online/FY16/EG, Act','5977 Online/FY17 Skøyen ISPUP','5977 Online/FY17 Tromsø ISPUP','5977 Online/FY17 Ålesund ISPUP','5977 Online/FY17/EG, Act','5977 Online/FY17/GWI, Act',
+									'5978 Online Video/FY16 GWI, Act','5978 Online Video/FY17 GWI, Act','5978 Online Video/FY17 Skøyen ISPUP','6013 Katalog','PR-avdelingen','Bygdeturisme','Visit Norway','Always On','Profil','Byporten','Fornebu S','Banken 3140','Fond','IPS Individuell Pensjonssparing','KLP','Glasmagasinet','3140','Paleet','Dream','Døla Is','Facebook','Iskake','Royal Pinneis',
+									'Sandwich','Småis','Wanted','Fjordland sentralt','Grøt','I skål','Sous Vide','Spiseklare mellommåltider','Sunt & Godt','KOS','Brelett','Bremykt','Double 0%','Yoplait','Jul','Diverse produkter','Felleskampanje Gilde og Prior','Ferdigstekte Hamburgere og Kjøttkaker','Go\' & Mager','Karbonader,','Kjøttpålegg','Lam','Middager','Profil Takk for maten','Pølser',
+									'Pålegg','Smårett','SØK','Forbruker','Grønt Punkt','Næringsliv','Liv Laga','Opphøgde potteter','Potetmel','Storhusholdning','KIL','Nyt Norge','Spesialitet','Økologisk','melk.no','Nortura Proff','MatPrat','MatPrat Rein','MatStart','Frukt og Grønt','Grønn kommunikasjon','Opplysningskontoret for frukt og grønt','Skolefrukt','Cheesepop','Fryd','Le Rustique','Michelangelo',
+									'Norzola','Selbu Blå','Snøfrisk','Egg','Felles','Kyllingnuggets','Pølseduellen','Felleskampanje','Julekampanje','Kommunikasjon','TINE Partner','TINEStafetten','Biola','Barer','Go\'Morgen','Jarlsberg','TINE Litago','Uten','Turtelkuene','Lettere Felleskampanje','Norvegia','Norvegia Laktosefri','TINE Norvegia Lettere','NÅ','Osteriet','Piano','TINE Piano Vaniljekrem',
+									'Vaniljesaus','Vaniljesaus Zero','Revet Ost','TINE Rislunsj','TINE Sprett','TINE Sprett Drikkeyoghurt','IsTe','Juice','Noisy','Sunniva felles','Sunniva Lett','Sunniva mormerke','Sunniva Original','Sunniva Premium','Sunniva Presset','SUPRI','TINE 14','TINE Brunost','TINE Brunost Junior','TINE Hvit Geitost','Dulce','Julelatte','TINE Iskaffe','Zero','TINE Kremgo',
+									'Matfløte','Cottage Cheese','Creme Fraiche','Kesam','Lettrømme','Matsans','Rømme','Smør','TINE Kremfløte','Melk','Styrk','TINE Yoghurt','TINE Yoghurt Fyldig','YT','TINE Østavind','Dolmio','Wrigley','Pedigree','Sheba','Snickers','Ris og korn','Whiskas Våtfor','Caddy og Transporter','Range','Skoda Forhandlerfond','VW','Kodiaq','Octavia','AUDI lokalannonsering',
+									'Karoq','Yeti','Superb','Nyttekjøretøy','Innstift i avis','Verksted','e-Golf','Sporty','Bruktbil','DAB+','Kvikk service Bergen','Felles forhandlerfakturering','Forh 11 v/Kjetil Presterud.','Forh 11,30,40,440,550,773 Kjetil Presterud.','Forh 150 v/ Kjetil Presterud.','Forh 290 v/Henrik Jensen.','Forh 30 v/Kjetil Presterud.','Forh 300 v/ Henrik Jensen.','Forh 330 v/ Henrik Jensen.',
+									'Forh 370 v/ Henrik Jensen.','Forh 390 v/Morten Lund.','Forh 40 v/Kjetil Presterud.','Forh 440 v/Morten Lund.','Forh 495 v/Morten Lund.','Forh 535 v/Henrik Jensen.','Forh 550 v/ Morten Lund.','Forh 610 v/Henrik Jensen.','Forh 770 v/Henrik Jensen.','Forh 773 v/ Morten Lund.','Forh 785 v/Kjetil Presterud.','Forh 801 v/Morten Lund.','Forh 830 v/ Henrik Jensen','Forh 851 v/Henrik Jensen',
+									'Approved Plus','AUDI','AUDI A4','AUDI A5','AUDI A8','AUDI Club Norway','AUDI Q5','AUDI R8','E-tron','Forhandleraktiviteter','Påske','Quattro','Team EKS','Forhandlerannonsering Service','Service','Amarok','Caddy, Transporter og Crafter','Caddy/Transporter','Crafter','Fast Start','Radio','Forh 051 v/Vidar Sand','Forh 083 v/Svein Manley','Forh 108 v/Harald Torjussen','Forh 124 v/Vidar Sand',
+									'Forh 137 v/Svein Manley','Forh 18 v/Svein Manley','Forh 221 v/Vidar Sand','Forh 255 v/Vidar Sand','Forh 300 v/Harald Torjussen','Forh 324 v/Vidar Sand','Forh 390 v/Harald Torjussen','Forh 440 v/Vidar Sand','Forh 472 v/Svein Manley','Forh 478 v/Vidar Sand','Forh 494 v/Harald Torjussen','Forh 556 v/Svein Manley','Forh 568 v/Vidar Sand','Forh 594 v/Harald Torjussen','Forh 607 v/Harald Torjussen',
+									'Forh 610 v/Svein Manley','Forh 650 v/Harald Torjussen','Forh 707 v/Svein Manley','Forh 768 v/Vidar Sand','Forh 770 v/Vidar Sand','Forh 801 v/Vidar Sand','Forh 820 v/Harald Torjussen','Forh 832 v/Vidar Sand','Forh 843 v/Vidar Sand','Forh 851 v/Harald Torjussen','Brand','Forhandler','Range Digital','Sykkel Sponsorat','Forh 10 v/Endre Nordbø','Forh 110 v/Erling Joranger','Forh 110 v/Morten Andresen',
+									'Forh 120 v/Arne Kjellemo','Forh 120 v/Morten Andresen','Forh 130 v/Arne Kjellemo','Forh 130 v/Martin Gjerstad','Forh 155 v/Arne Kjellemo','Forh 155 v/Bjørn Roar Østli','Forh 156 v/Arne Kjellemo','Forh 156 v/Bjørn Roar Østli','Forh 160 v/Arne Kjellemo','Forh 160 v/Bjørn Roar Østli','Forh 185 v/Endre Nordbø','Forh 20 v/Endre Nordbø','Forh 21 v/Arne Kjellemo','Forh 21 v/Martin Gjerstad','Forh 212 v/Erling Joranger',
+									'Forh 220 v/Bjørn Roar Østli','Forh 230 v/Erling Joranger','Forh 250 v/Erling Joranger','Forh 250+370 v/Martin Gjerstad','Forh 270 v/Erling Joranger','Forh 290 v/Endre Nordbø','Forh 290 v/Martin Gjerstad','Forh 300 v/Arne Kjellemo','Forh 301 v/Arne Kjellemo','Forh 302 v/Arne Kjellemo','Forh 32 v/Endre Nordbø','Forh 32 v/Martin Gjerstad','Forh 330 v/Erling Joranger','Forh 330 v/Martin Gjerstad','Forh 340 v/David O\'Sullivan',
+									'Forh 340 v/Erling Joranger','Forh 350 v/Erling Joranger','Forh 351 v/Morten Andresen','Forh 360 v/Ende Nordbø','Forh 370 v/Erling Joranger','Forh 380 v/Endre Nordbø','Forh 390 v/Bjørn Roar Østli','Forh 390 v/Erling Joranger','Forh 40 v/Endre Nordbø','Forh 400 v/Erling Joranger','Forh 410 v/Bjørn Roar Østli','Forh 410 v/Erling Joranger','Forh 440 v/Endre Nordbø','Forh 440+550 v/Morten Andresen',
+									'Forh 469 v/Erling Joranger','Forh 469 v/Morten Andresen','Forh 470 v/Endre Norbø','Forh 470 v/Martin Gjerstad','Forh 474 v/Endre Nordbø','Forh 480 v/Erling Joranger','Forh 480 v/Martin Gjerstad','Forh 490 v/Martin Gjerstad','Forh 493 v/Arne Kjellemo','Forh 512 v/Arne Kjellemo','Forh 512 v/Morten Andresen','Forh 520 v/Bjørn Roar Østlie','Forh 520 v/Erling Joranger','Forh 530 v/Bjørn Roar Østli',
+									'Forh 530 v/Erling Joranger','Forh 535 v/Bjørn Roar Østli','Forh 535 v/Erling Joranger','Forh 540 v/Erling Joranger','Forh 550 v/Endre Nordbø','Forh 560 v/Arne Kjellemo','Forh 590 v/Endre Nordbø','Forh 600 v/Arne Kjellemo','Forh 610 v/Arne Kjellemo','Forh 610 v/Morten Andresen','Forh 630 v/Erling Joranger','Forh 640 v/Endre Nordbø','Forh 640 v/Tom/Stian','Forh 650 v/Endre Nordbø','Forh 660 v/Arne Kjellemo',
+									'Forh 680 v/Endre Nordbø','Forh 690 v/Erling Joranger','Forh 700+780 v/Martin Gjerstad','Forh 745 v/Endre Nordbø','Forh 770 v/Endre Nordbø','Forh 770 v/Martin Gjerstad','Forh 773 v/Endre Nordbø','Forh 780 v/Arne Kjellemo','Forh 790 v/Erling Joranger','Forh 790,795,230 v/Bjørn Roar Østlie','Forh 790+795+230 v/Erling Joranger','Forh 795 v/Erling Joranger','Forh 801 v/Endre Nordbø','Forh 801 v/Morten Andresen',
+									'Forh 810 v/Endre Nordbø','Forh 812 v/Endre Nordbø','Forh 820 v/Endre Nordbø','Forh 820 v/Morten Andresen','Forh 822 v/Endre Nordbø','Forh 830 v/Arne Kjellemo','Forh 830 v/Bjørn Roar Østli','Forh 832 v/Arne Kjellemo','Forh 832 v/Bjørn Roar Østli','Forh 834 v/Bjørn Roar Østli','Forh 835 v/Arne Kjellemo','Forh 851 v/Bjørn Roar Østli','Forh 851 v/Erling Joranger','Forh 880 v/Erling Joranger',
+									'Forh 880 v/Morten Andresen','Forh 900 v/Arne M. Kjellemo','Forh 900 v/Bjørn Roar Østli','Forh 920 v/Arne Kjellemo','Forh 940 v/Arne Kjellemo','1 Million','Always On digital','Frankfurtmesse','Geneve','Gullfisken','Bilvelger','Familiekampanje','Innovasjon','Trailerassist','Arteon','Golf lansering','POLO','Tiguan Allspace','Treffpunkt','T-Roc lansering','Golf','Golf Stasjonsvogn','Prøvekjøring',
+									'Spons','DSG','AUDI Service','VW Nytte','Skoda annonsering','Fellesannonse Jubileum','Skoda Forhanderfond','Nytte','Rapid','Service felles','Sun Mobility','Kino','Skien Bil og Grenland Auto','Lagersalg','After Eight','Nestlé Cheerios','L\'Atelier','Viking melk','Purina Dog Adventuros','Fitness','Nestlé Friskies','Purina','Resorb','Maggi','Nescafé Azera','Nescafé Gull','B2B','B2C Iced Coffee',
+									'Nespresso','Nespresso Iskaffe','MULTI','Purina One Cat','Purina One Dog','D7500','Nikon Sport Optics','Print','TV','Skagen Compass','Barn','Damesko','Magic Box','PF11','PF31 og PF41','Prosjekt og Nybygg','Andel Forsikring','Byttehelg','Nasjonal ASK','Pensjonskonto','Spleis','ASK','BFFT','Personforsikring','BM','IPS','Jobbannonser','SPINN','mCASH','Aksjesparekonto','TUT','PETRO Finans','Vipps',
+									'Kundeutbytte','Merkevare','REAL Mat 51000630/6401/Erik Anker','Rex Diesel','Annonsering','Athletica','SiO','W1','W2','W3','W4','W5','Tempur','Retargeting','Mensendieck Trening','Content/Plastikk kirurgi','Cosmedical','Helse & Velvære','Hjerte/Kardiologi','Hud','Informasjonsmøte Håndkirurgi','Informasjonsmøte Håndkirurgi og vonde knær','Informasjonsmøte Åreknuter','Informasjonsmøte Åreknuter og prostata kreft',
+									'Kreftbehandling','Kvinnehelseuke 2017','Overvektskirurgi','Programatisk','Sterilisering','Tema-kveld','Temakveld for håndlidelser','Temakveld Knær','Urologi','Åreknuter'];
+				
+				//$scope.campaign.channel='<Plukke ut Kampanje Navn>';
+				$scope.channelList=['Digital - Display','Digital - Paid Social','TV - National','Outdoor - Ooh','Cinema - Ads/commercial','Digital - Video/web TV','Print - Local newspapers','Print - Newspapers','Radio - Local','Radio - National','Print - Trade press','Print - Magazines','Digital - SEM','TV - Spons RBS','DM - Direct mail','Digital - Blogs','Mobil - Display','Digital - Social','Mobil - App/inAPP',
+				'TV - Spons Program','Misc.','Outdoor - Digital OoH','Digital - Performance','TV - Local'];
+				$scope.regionList=['Sparebank 1 Banksamarbeidet','Sparebank 1 SNN','Sparebank 1 SMN ','Sparebank 1 SR ','Sparebank 1 Østlandet','Sparebank 1 SØA ','Sparebak 1 BV ','Sparebank 1 Ringerike Hadeland','Sparebank 1 Hallingdal Valdres','Sparebank 1 Modum','Sparebank 1 Lom og Skjåk','Sparebank 1 Nordvest','Sparebank 1 Søre Sunnmøre','Sparebank 1 Gudbrandsdalen'];
+				
+				$scope.clientSelected = function(client){
+					console.log(client);
+					if(client.match(/\bTINE/gi)){
+						console.log("TINE");
+						document.getElementById("datepicker").style.display="block";
+						document.getElementById("geolocation").style.display="none";
+						$scope.overList=['** Produkt mangler **','TINE Overordnet','Drikke','Frokost og lunsj','Mellommåltid','Turtelkuene','Middag, matlaging, dessert','SØK','Sunniva','Matfløte'];
+						$scope.productList=['** Produkt mangler **','Felleskampanje','Julekampanje','Kommunikasjon','Profil','SØK','TINE Partner','TINEStafetten','Biola','Barer','Go\'Morgen','Jarlsberg','TINE Litago','Uten','Turtelkuene','Lettere Felleskampanje','Norvegia','Norvegia Laktosefri','TINE Norvegia Lettere','NÅ','Osteriet','Piano','TINE Piano Vaniljekrem','Vaniljesaus','Vaniljesaus Zero','Revet Ost','TINE Rislunsj','TINE Sprett','TINE Sprett Drikkeyoghurt',
+											'IsTe','Juice','Noisy','Sunniva felles','Sunniva Lett','Sunniva mormerke','Sunniva Original','Sunniva Premium','Sunniva Presset','SUPRI','TINE 14','TINE Brunost','TINE Brunost Junior','TINE Hvit Geitost','Dulce','Julelatte','TINE Iskaffe','Zero','TINE Kremgo','Matfløte','Cottage Cheese','Creme Fraiche','Felles','Kesam','Lettrømme','Matsans','Rømme','Smør','TINE Kremfløte','Melk','Styrk','TINE Yoghurt','TINE Yoghurt Fyldig','YT','TINE Østavind'];
+					}
+					else if(client.match(/\bSpareBank 1/gi)){
+						console.log("SpareBank 1");
+						document.getElementById("datepicker").style.display="none";
+						document.getElementById("geolocation").style.display="block";
+						$scope.overList=['Andel Forsikring','Byttehelg','Nasjonal ASK','Pensjonskonto','Spleis','SØK','** Produkt mangler **','ASK','BFFT','Boliglån','Personforsikring','BM','IPS','Jobbannonser','SPINN','mCASH','Aksjesparekonto','TUT','PETRO Finans','Vipps','Kundeutbytte','Merkevare'];
+						$scope.productList=['Andel Forsikring','Byttehelg','Nasjonal ASK','Pensjonskonto','Spleis','SØK','** Produkt mangler **','ASK','BFFT','Boliglån','Personforsikring','BM','IPS','Jobbannonser','SPINN','mCASH','Aksjesparekonto','TUT','PETRO Finans','Vipps','Kundeutbytte','Merkevare'];
+					}
+					else{
+						document.getElementById("datepicker").style.display="none";
+						document.getElementById("geolocation").style.display="none";
+					}
+					$scope.campaign.over="";
+					$scope.campaign.product="";
+					$scope.campaign.region="";
+					$scope.date="";
+					$scope.name="";
+					$scope.info="";
+					$scope.campaignName="";
+					
+				}
+				
+				$scope.overSelected = function(){
+					$scope.campaign.product="";
+					$scope.campaign.region="";
+					$scope.date="";
+					$scope.name="";
+					$scope.info="";
+					$scope.campaignName="";
+				}
+				
+				$scope.productSelected = function(){
+					$scope.campaign.region="";
+					$scope.date="";
+					$scope.name="";
+					$scope.info="";
+					$scope.campaignName="";
+				}
+				
+				$scope.dateSelected = function(){
+					$scope.campaign.region="";
+					$scope.name="";
+					$scope.info="";
+					$scope.campaignName="";
+				}
+				
+				$scope.regionSelected = function(){
+					$scope.date="";
+					$scope.name="";
+					$scope.info="";
+					$scope.campaignName="";
+				}
+				
+				$scope.getCampaignNAme = function(){
+					console.log($scope.name);
+					if($scope.campaign.client.match(/\bTINE/gi)){
+						$scope.campaignName=$scope.date.split(',')[1] + '_' + $scope.date.split(' ')[1].substring(0, 3) + '_' + $scope.campaign.over + '_' + $scope.campaign.product + '_' + $scope.name;
+					}
+					else if($scope.campaign.client.match(/\bSpareBank 1/gi)){
+						$scope.campaignName=$scope.campaign.region + '_' + $scope.campaign.over + '_' + $scope.campaign.product + '_' + $scope.name;
+					}
+					else
+						$scope.campaignName=$scope.campaign.client + '_' + $scope.campaign.over + '_' + $scope.campaign.product + '_' + $scope.name;
+				}
+				
+				$('.datepicker').pickadate({
+					selectMonths: true, // Creates a dropdown to control month
+					selectYears: 15, // Creates a dropdown of 15 years to control year,
+					today: 'Today',
+					clear: 'Clear',
+					close: 'Ok',
+					closeOnSelect: true // Close upon selecting a date,
+				  });
+				
+				$scope.copy = function(){
+				   if($scope.campaignName!=""){
+					var copyText = document.getElementById("campaignName");
+					copyText.select();
+					document.execCommand("Copy");
+					//alert("Copied the text: " + copyText.value);
+					var $toastContent = $('<span>Kopierte teksten</span>');
+					Materialize.toast($toastContent, 5000, 'rounded');
+				   }
+				   else{
+					var $toastContent = $('<span>vennligst fyll ut alle detaljer</span>');
+					Materialize.toast($toastContent, 5000, 'rounded');
+					}
+				}
+				
+				//save.....
+				
+			});
+			
+		</script>
+		<header>	
+			<main>
+				<nav>
+					<div class="nav-wrapper z-depth-0 white" ng-controller="InfoController">
+						<ul class="left">      	 
+							<img src="https://www.mediacom.no/content/themes/mediacom/assets/build/images/mediacom-logo.svg" class="logo" >
+						</ul>
+						<ul class="hide-on-med-and-down right">
+						<!--	<li><a href="" ng-click="change()">Change experience</a></li> 						
+							<li><a href="" ng-click="signout()">Signout</a></li> -->
+						</ul>
+					</div>
+				</nav>
+			</main>	
+		</header>
+		<div class="row col s12 m12 l12" ng-controller="InfoController">
+			<!--Add buttons to initiate auth sequence and sign out
+			 <button id="authorize-button" style="display: none;">Authorize</button>
+			 <button id="signout-button" style="display: none;">Sign Out</button>-->
+			<div class="row col s10 m8 l8 offset-s1 offset-m2 offset-l2 z-depth-1 container">
+				<h4 align="center">Navngi generatoren</h4>
+				<div class="row"></div>
+				<div class="col l12 m12 s12">
+					<div class="col s12 m4 l3">
+						<p>Hva heter du</p>
+					</div>
+					<div class="col s12 m7 l9">
+					<!--	<select id ="operator" ng-change="operatorSelected()" ng-model="campaign.operator" material-select watch required>
+							<option ng-repeat="oper in operatorList">{{oper}}</option>
+						</select>-->	
+						<input list="operator" id="operatorName" name="browser" ng-model="campaign.operator" placeholder="Plukke ut Operatør navn">
+						<datalist id="operator">
+							<option ng-repeat="oper in operatorList">{{oper}}</option>
+						</datalist>
+					</div>
+				</div>		
+				<div class="col l12 m12 s12">
+					<div class="col s12 m4 l3">
+						<p>Kundenavn</p>
+					</div>
+					<div class="col s12 m7 l9">
+					<!--	<select id ="client" ng-change="clientSelected(campaign.client)" ng-model="campaign.client" material-select watch required>
+							<option ng-repeat="client in clientList">{{client}}</option>
+						</select>-->
+						<input list="client" id="clientName" name="browser" ng-model="campaign.client" ng-change="clientSelected(campaign.client)" placeholder="Plukke ut Kundenavn">
+						<datalist id="client">
+							<option ng-repeat="client in clientList">{{client}}</option>
+						</datalist>						
+					</div>
+				</div>	
+				<div class="col l12 m12 s12">
+					<div class="col s12 m4 l3">
+						<p>Overprodukt</p>
+					</div>
+					<div class="col s12 m7 l9">
+					<!--	<select id ="over" ng-change="overSelected()" ng-model="campaign.over" material-select watch required>
+							<option ng-repeat="over in overList track by $index">{{over}}</option>
+						</select>-->
+						<input list="over" id="overName" name="browser" ng-model="campaign.over" placeholder="Plukke ut Overprodukt" ng-change="overSelected()">
+						<datalist id="over">
+							<option ng-repeat="over in overList track by $index">{{over}}</option>
+						</datalist>							
+					</div>
+				</div>	
+				<div class="col l12 m12 s12">
+					<div class="col s12 m4 l3">
+						<p>Produkt</p>
+					</div>
+					<div class="col s12 m7 l9">
+					<!--	<select id ="product" ng-change="productSelected()" ng-model="campaign.product" material-select watch required>
+							<option ng-repeat="product in productList">{{product}}</option>
+						</select-->
+						<input list="product" id="productName" name="browser" ng-model="campaign.product" placeholder="Plukke ut Produkt" ng-change="productSelected()">
+						<datalist id="product">
+							<option ng-repeat="product in productList">{{product}}</option>
+						</datalist>							
+					</div>
+				</div>	
+			<!--	<div class="col l12 m12 s12">
+					<div class="col s6 m4 l3">
+						<p>Medietypenavn</p>
+					</div>
+					<div class="col s6 m7 l9">
+						<select id ="channel" ng-change="channelSelected()" ng-model="campaign.channel" material-select watch required>
+							<option ng-repeat="channel in channelList">{{channel}}</option>
+						</select>		    
+					</div>
+				</div>	-->
+				<div class="col l12 m12 s12" id="datepicker" style="display:none;">
+					<div class="col s12 m4 l3">
+						<p>Date</p>
+					</div>
+					<div class="col s12 m7 l9">
+						<input type="text" id="date" class="datepicker" ng-model="date" placeholder="Tast inn Date" ng-change="dateSelected()">								
+					</div>
+				</div>
+				<div class="col l12 m12 s12" id="geolocation" style="display:none;">
+					<div class="col s12 m4 l3">
+						<p>Region</p>
+					</div>
+					<div class="col s12 m7 l9">
+						<input list="region" id="regionName" name="region" ng-model="campaign.region" placeholder="Plukke ut Region" ng-change="regionSelected()">
+						<datalist id="region">
+							<option ng-repeat="region in regionList">{{region}}</option>
+						</datalist>		    
+					</div>
+				</div>				
+				<div class="col l12 m12 s12">
+					<div class="col s12 m4 l3">
+						<p>Kampanjenavn</p>
+					</div>
+					<div class="col s12 m7 l9">
+						<input id ="name" ng-model="name" placeholder="Tast inn Kampanje Navn" ng-change="getCampaignNAme();" required>			    
+					</div>
+				</div>	
+				<div class="col l12 m12 s12">
+					<div class="col s12 m4 l3">
+						<p>Eventuell tilleggsinformasjon</p>
+					</div>
+					<div class="col s12 m7 l9">
+						<input id ="info" ng-model="info" placeholder="Tast inn Eventuell tilleggsinformasjon">			    
+					</div>
+				</div>	
+				<div class="col l12 m12 s12" style="margin-bottom:10px;">
+					<div class="col s12 m4 l3">
+						<p>Nytt kampanjenavn</p>
+					</div>
+					<div class="col s12 m6 l7">
+						<input id ="campaignName" ng-model="campaignName" placeholder="Endelig produksjon" readonly>	    
+					</div>
+					<div class="col s2 m2 l2 offset-s4" id="copy" style="padding-top:7px;display:none;">
+						<button class="btn waves-effect center waves-light pink" type="submit" name="action" ng-click="copy()" >kopiere
+        					<i class="material-icons right">send</i></button>
+					</div>
+					<div class="col s2 m2 l2 offset-s4" id="copy_mobile" style="padding-top:7px;">
+						<a><img src="https://raw.githubusercontent.com/shreshthanabler/images/master/copy.png" ng-click="copy()" style="height: 40px;margin-top: -5px;"></a>
+					</div>
+				</div>
+				<div class="row col s4 m2 l4 offset-s2 offset-l4 offset-m4" style="padding-top:7px;">
+						<button class="btn waves-effect center waves-light pink" type="submit" name="action" onclick="makeApiCall()" >Lagre Informasjon
+        					<i class="material-icons right">send</i></button>
+				</div>
+			</div>
+			
+			<!-- Modal Structure -->
+			  <div id="modal1" class="modal" style="z-index: 100;top:30%;overflow:hidden;">
+			    <div class="modal-content">
+			      <h5 align="center">Godkjen deg selv ved å logge på Google-konto</h5>
+			    </div>
+			    <div class="modal-footer center">
+				<div class="row">
+			      		<button class="btn waves-effect center waves-light pink" id="authorize-button1" style="display: block; margin-left:  auto;  margin-right: auto; float:none;">Autorisere</button>
+				</div>
+			    </div>
+			  </div>
+			<div id="cover">
+  		</div>
+		<script>
+			// Client ID and API key from the Developer Console
+		      var CLIENT_ID = '622320244089-k2r7rkiaadpm5sufp415jcofa8m2ss20.apps.googleusercontent.com';
+		      var API_KEY = 'AIzaSyA8m2aF8gfWqyw7D9_4oioznw4sTnyyiDE';
+		      // Array of API discovery doc URLs for APIs used by the quickstart
+		      var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+		      // Authorization scopes required by the API; multiple scopes can be
+		      // included, separated by spaces.
+		      var SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+		      var authorizeButton = document.getElementById('authorize-button1');
+		     // var signoutButton = document.getElementById('signout-button');
+		      /**
+		       *  On load, called to load the auth2 library and API client library.
+		       */
+		      function handleClientLoad() {
+			gapi.load('client:auth2', initClient);
+		      }
+		      /**
+		       *  Initializes the API client library and sets up sign-in state
+		       *  listeners.
+		       */
+		      function initClient() {
+			gapi.client.init({
+			  apiKey: API_KEY,
+			  clientId: CLIENT_ID,
+			  discoveryDocs: DISCOVERY_DOCS,
+			  scope: SCOPES
+			}).then(function () {
+			  // Listen for sign-in state changes.
+			  gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+			  // Handle the initial sign-in state.
+			  updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+			  authorizeButton.onclick = handleAuthClick;
+			//  signoutButton.onclick = handleSignoutClick;
+			});
+		      }
+		      /**
+		       *  Called when the signed in status changes, to update the UI
+		       *  appropriately. After a sign-in, the API is called.
+		       */
+		      function updateSigninStatus(isSignedIn) {
+			if (isSignedIn) {
+			  authorizeButton.style.display = 'none';
+			  document.getElementById("modal1").style.display='none'
+			  document.getElementById("cover").style.display='none'
+			 // signoutButton.style.display = 'block';
+			  //listMajors();
+			  //makeApiCall();
+			} else {
+			  authorizeButton.style.display = 'block';  
+			  document.getElementById("modal1").style.display='block'
+			  document.getElementById("cover").style.display='block'
+			 // signoutButton.style.display = 'none';
+			}
+		      }
+		      /**
+		       *  Sign in the user upon button click.
+		       */
+		      function handleAuthClick(event) {
+			gapi.auth2.getAuthInstance().signIn();
+		      }
+		      /**
+		       *  Sign out the user upon button click.
+		       */
+		      function handleSignoutClick(event) {
+			gapi.auth2.getAuthInstance().signOut();
+		      }
+			
+			 /**
+		       * Append a pre element to the body containing the given message
+		       * as its text node. Used to display the results of the API call.
+		       *
+		       * @param {string} message Text to be placed in pre element.
+		       */
+		      function appendPre(message) {
+			var pre = document.getElementById('content');
+			var textContent = document.createTextNode(message + '\n');
+			pre.appendChild(textContent);
+		      }
+		      /**
+		       * Print the names and majors of students in a sample spreadsheet:
+		       * https://docs.google.com/spreadsheets/d/1ks-O7G5HCeTlpuWwdD7zO6ThNW77SxBfc8eNLRdcO9A/edit
+		       */
+		      function listMajors() {
+			gapi.client.sheets.spreadsheets.values.get({
+			  //  spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+			  spreadsheetId: '1ks-O7G5HCeTlpuWwdD7zO6ThNW77SxBfc8eNLRdcO9A',
+			  range: 'A2:A4',
+			}).then(function(response) {
+			  var range = response.result;
+			  if (range.values.length > 0) {
+			    appendPre('Name, Major:');
+			    for (i = 0; i < range.values.length; i++) {
+			      var row = range.values[i];
+			      // Print columns A and E, which correspond to indices 0 and 4.
+			      appendPre(row[0] + ', ' + row[4]);
+			    }
+			  } else {
+			    appendPre('No data found.');
+			  }
+			}, function(response) {
+			  appendPre('Error: ' + response.result.error.message);
+			});
+		      }
+			function makeApiCall() {
+			      var operator_name = document.getElementById('operatorName').value;
+			      var client_name = document.getElementById('clientName').value;
+			      var over_name = document.getElementById('overName').value;
+			      var product_name = document.getElementById('productName').value;
+			      var date = document.getElementById('date').value;
+			      var region = document.getElementById('regionName').value;
+			      var campaign_name = document.getElementById('campaignName').value;
+			      
+			      if(date==""){
+				 date="NA";
+			       }
+			       if(region==""){
+				 region="NA";
+			       }
+			      var params = {
+				// The ID of the spreadsheet to update.
+				spreadsheetId: '1ks-O7G5HCeTlpuWwdD7zO6ThNW77SxBfc8eNLRdcO9A',  // TODO: Update placeholder value.
+				// The A1 notation of the values to update.
+				range: 'A1:E5',  // TODO: Update placeholder value.
+				// How the input data should be interpreted.
+				valueInputOption: 'USER_ENTERED',  // TODO: Update placeholder value.
+			      };
+			      var valueRangeBody = {
+				// TODO: Add desired properties to the request body. All existing properties
+				// will be replaced.
+			      };
+				var resource = {
+				  "majorDimension": "ROWS",
+				  "values": [
+					    [operator_name, client_name, over_name, product_name,date,region,campaign_name]
+					  ],
+				}
+			     if(campaign_name!=""){
+			      var request = gapi.client.sheets.spreadsheets.values.append(params, resource);
+      				request.then(function(response) {
+				// TODO: Change code below to process the `response` object:
+				   var $toastContent = $('<span>informasjon lagret</span>');
+				   Materialize.toast($toastContent, 5000, 'rounded');
+				  document.location.reload(true)
+				console.log(response.result);
+			      }, function(reason) {
+				console.error('error: ' + reason.result.error.message);
+			      });
+			     }
+				else{
+				   var $toastContent = $('<span>vennligst fyll ut alle detaljer</span>');
+				   Materialize.toast($toastContent, 5000, 'rounded');
+				}
+			    }
+		    </script>
+
+		    <script async defer src="https://apis.google.com/js/api.js"
+		      onload="this.onload=function(){};handleClientLoad()"
+		      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+		    </script>
+  
+	</body>
+</html>
